@@ -5,3 +5,6 @@
 *.jar
 *.war
 *.ear
+
+# Include SQLite JDBC library.
+!sqlite-jdbc-3.7.2.jar
