@@ -24,31 +24,35 @@ import org.xml.sax.SAXException;
 /**
  * Parses XML from the Overview of Greek Syntax text and converts Beta Code to
  * Greek characters.
+ * 
  * @author Ben Linskey
- *
+ * 
  */
 public class SyntaxParser extends GreekTextParser {
-	/**
-	 * Class constructor.
-	 * @param xml	the XML to parse
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 */
-	public SyntaxParser(String xml) 
-			throws ParserConfigurationException, SAXException, IOException {
-		super(xml);
-	}
-	
-	/**
-	 * Returns the XML for this section, with all Beta Code converted to Greek
-	 * characters.
-	 * @return	the XML for this section with all Beta Code converted to Greek
-	 * 			characters
-	 */
-	public String transcode() {
-		transcodeInElements("quote");
-		transcodeInElements("foreign");
-		return getUpdatedXML();
-	}
+    /**
+     * Class constructor.
+     * 
+     * @param xml
+     *            the XML to parse
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public SyntaxParser(String xml) throws ParserConfigurationException,
+            SAXException, IOException {
+        super(xml);
+    }
+
+    /**
+     * Returns the XML for this section, with all Beta Code converted to Greek
+     * characters.
+     * 
+     * @return the XML for this section with all Beta Code converted to Greek
+     *         characters
+     */
+    public String transcode() {
+        transcodeInElements("quote");
+        transcodeInElements("foreign");
+        return getUpdatedXML();
+    }
 }

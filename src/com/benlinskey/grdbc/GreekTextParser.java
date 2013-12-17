@@ -39,93 +39,102 @@ import org.xml.sax.SAXException;
 import edu.unc.epidoc.transcoder.TransCoder;
 
 /**
+ * An abstract class for parsing Greek text encoded in an XML document.
+ * 
  * @author Ben Linskey
- *
+ * 
  */
 public abstract class GreekTextParser {
-	protected Document doc;
-	protected TransCoder transcoder;
-	
-	/**
-	 * Class constructor.
-	 * @param xml	the XML to parse
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 */
-	protected GreekTextParser(String xml) 
-			throws ParserConfigurationException, SAXException, IOException {
-		// Parse the XML and create a Document.
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		DocumentBuilder db = dbf.newDocumentBuilder();
-		InputSource is = new InputSource(new StringReader(xml));
-		doc = db.parse(is);
-		
-		// Create a TransCoder for converting Beta Code to Greek characters.
-		try {
-			transcoder = new TransCoder("BetaCode", "UnicodeC");
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-	}
-	
-	/**
-	 * Transcodes beta code to Greek in elements with the given name.
-	 * @param element	the name of the element to search for
-	 */
-	protected void transcodeInElements(String element) {
-		NodeList nodeList = doc.getElementsByTagName(element);
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			Node elementNode = nodeList.item(i);
-			Node langAttr = elementNode.getAttributes().getNamedItem("lang");
-			if (langAttr != null) {
-				String lang = langAttr.getTextContent();
-				if (lang.equals("greek")) {
-					String greek = betaToGreek(elementNode.getTextContent());
-					elementNode.setTextContent(greek);
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Returns a string containing an XML representation of the document in its 
-	 * current state.
-	 * @return	a string containing an XML representation of the document in its 
-	 * 			current state
-	 */
-	protected String getUpdatedXML() {
-		StringWriter writer = new StringWriter();
-		try {
-			TransformerFactory tf = TransformerFactory.newInstance();
-			Transformer transformer = tf.newTransformer();
-			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(writer);
-			transformer.transform(source, result);
-		} catch (TransformerConfigurationException e) {
-			e.printStackTrace();
-			System.exit(1);
-		} catch (TransformerException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		return writer.toString();
-	}
-	
-	/**
-	 * Converts Beta Code to Greek characters.
-	 * @param beta	the Beta Code to transcode
-	 * @return	the Greek equivalent of the specified Beta Code
-	 */
-	protected String betaToGreek(String beta) {
-		String greek = null;
-		try {
-			greek = transcoder.getString(beta); 
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		return greek;
-	}
+    protected Document doc;
+    protected TransCoder transcoder;
+
+    /**
+     * Class constructor.
+     * 
+     * @param xml
+     *            the XML to parse
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    protected GreekTextParser(String xml) throws ParserConfigurationException,
+            SAXException, IOException {
+        // Parse the XML and create a Document.
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        InputSource is = new InputSource(new StringReader(xml));
+        doc = db.parse(is);
+
+        // Create a TransCoder for converting Beta Code to Greek characters.
+        try {
+            transcoder = new TransCoder("BetaCode", "UnicodeC");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    /**
+     * Transcodes beta code to Greek in elements with the given name.
+     * 
+     * @param element
+     *            the name of the element to search for
+     */
+    protected void transcodeInElements(String element) {
+        NodeList nodeList = doc.getElementsByTagName(element);
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node elementNode = nodeList.item(i);
+            Node langAttr = elementNode.getAttributes().getNamedItem("lang");
+            if (langAttr != null) {
+                String lang = langAttr.getTextContent();
+                if (lang.equals("greek")) {
+                    String greek = betaToGreek(elementNode.getTextContent());
+                    elementNode.setTextContent(greek);
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns a string containing an XML representation of the document in its
+     * current state.
+     * 
+     * @return a string containing an XML representation of the document in its
+     *         current state
+     */
+    protected String getUpdatedXML() {
+        StringWriter writer = new StringWriter();
+        try {
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(writer);
+            transformer.transform(source, result);
+        } catch (TransformerConfigurationException e) {
+            e.printStackTrace();
+            System.exit(1);
+        } catch (TransformerException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return writer.toString();
+    }
+
+    /**
+     * Converts Beta Code to Greek characters.
+     * 
+     * @param beta
+     *            the Beta Code to transcode
+     * @return the Greek equivalent of the specified Beta Code
+     */
+    protected String betaToGreek(String beta) {
+        String greek = null;
+        try {
+            greek = transcoder.getString(beta);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return greek;
+    }
 }
