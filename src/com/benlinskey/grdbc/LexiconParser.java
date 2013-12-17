@@ -100,9 +100,22 @@ public class LexiconParser extends GreekTextParser {
 	 * 			characters
 	 */
 	public String getEntry() {
+		transcodeEntryKey();
 		transcodeInElements("orth");
 		transcodeInElements("ref");
 		transcodeInElements("foreign");
 		return getUpdatedXML();
+	}
+	
+	/**
+	 * Converts the value of the entry element's "key" attribtute from Beta
+	 * Code to Greek. 
+	 */
+	private void transcodeEntryKey() {
+		Node entryNode = doc.getElementsByTagName("entry").item(0);
+		Node keyAttr = entryNode.getAttributes().getNamedItem("key");
+		String beta = keyAttr.getTextContent();
+		String greek = betaToGreek(beta);
+		keyAttr.setTextContent(greek);
 	}
 }
