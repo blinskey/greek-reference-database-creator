@@ -39,23 +39,16 @@ import org.xml.sax.SAXException;
 import edu.unc.epidoc.transcoder.TransCoder;
 
 /**
- * This class provides methods to parse a chunk of XML containing a lexicon
- * entry, modify the data contained therein, and return data to be inserted
- * into the database.
+ * Parses XML from the Overview of Greek Syntax text and converts Beta Code to
+ * Greek characters.
  * @author Ben Linskey
+ *
  */
-public class LexiconParser {
+public class SyntaxParser {
 	private Document doc;
 	private TransCoder transcoder;
 	
-	/**
-	 * Class constructor.
-	 * @param xml	the XML to parse
-	 * @throws ParserConfigurationException 
-	 * @throws IOException 
-	 * @throws SAXException 
-	 */
-	public LexiconParser(String xml) 
+	public SyntaxParser(String xml) 
 			throws ParserConfigurationException, SAXException, IOException {
 		// Parse the XML and create a Document.
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -73,66 +66,13 @@ public class LexiconParser {
 	}
 	
 	/**
-	 * Returns a Beta Code representation of this entry's word, stripped of
-	 * all diacritics.
-	 * @return	this entry's word in Beta Code without diacritics
-	 */
-	public String getBetaNoSymbols() {
-		// Get the word and replace all symbols with an empty string.
-		return getBetaSymbols().replaceAll("[^a-zA-Z]", "");
-	}
-	
-	/**
-	 * Returns a Beta Code representation of this entry's word.
-	 * @return	this entry's word in Beta Code
-	 */
-	public String getBetaSymbols() {
-		// We just need the "key" attribute from the "entry" element.
-		Node entry = doc.getElementsByTagName("entry").item(0);
-		return entry.getAttributes().getNamedItem("key").getTextContent();
-	}
-	
-	/**
-	 * Returns this entry's word in Greek characters.
-	 * @return	this entry's word in Greek characters
-	 */
-	public String getGreekFullWord() {
-		// Use the transcoder to convert the beta code to Greek.
-		return betaToGreek(getBetaSymbols());
-	}
-	
-	/**
-	 * Returns this entry's word in Greek characters, stripped of all 
-	 * diacritics.
-	 * @return	this entry's word in Greek characters without diacritics
-	 */
-	public String getGreekNoSymbols() {
-		// Get beta code with no symbols other than the capital letter marker.
-		String beta = getBetaSymbols().replaceAll("[^a-zA-Z\\*]", "");
-		
-		// Use the transcoder to convert the beta code to Greek.
-		return betaToGreek(beta);
-	}
-	
-	/**
-	 * Returns this entry's word in all lowercase Greek characters, stripped
-	 * of all diacritics.
-	 * @return	this entry's word in lowercase Greek characters without 
-	 * 			diacritics
-	 */
-	public String getGreekLowercase() {
-		return getGreekNoSymbols().toLowerCase();
-	}
-	
-	/**
-	 * Returns the XML for this entry, with all Beta Code converted to Greek
+	 * Returns the XML for this section, with all Beta Code converted to Greek
 	 * characters.
-	 * @return	the XML for this entry with all Beta Code converted to Greek
+	 * @return	the XML for this section with all Beta Code converted to Greek
 	 * 			characters
 	 */
-	public String getEntry() {
-		transcodeInElements("orth");
-		transcodeInElements("ref");
+	public String transcode() {
+		transcodeInElements("quote");
 		transcodeInElements("foreign");
 		return getUpdatedXML();
 	}

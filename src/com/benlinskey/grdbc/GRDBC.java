@@ -28,11 +28,12 @@ public class GRDBC {
 		
 		String opt = args[0];
 		if (opt.equals("-a")) {
-			// TODO
+			(new LexiconCreator()).run();
+			(new SyntaxCreator()).run();
 		} else if (opt.equals("-l")) {
 			(new LexiconCreator()).run();
 		} else if (opt.equals("-g")) {
-			// TODO
+			(new SyntaxCreator()).run();
 		} else {
 			displayUsage();
 		}
