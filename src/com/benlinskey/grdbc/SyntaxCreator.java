@@ -109,7 +109,7 @@ public class SyntaxCreator {
 		try {
 			String dropTable = "DROP TABLE IF EXISTS " + TABLE_NAME;			
 			String createTable = "CREATE TABLE " + TABLE_NAME + " (" + 
-					"_ID 			INT PRIMARY KEY, " +
+					"_ID 			INTEGER PRIMARY KEY, " +
 					"chapter	 	VARCHAR(100), " +
 					"section	 	VARCHAR(100), " +
 					"xml			TEXT)";			
