@@ -16,27 +16,11 @@
 package com.benlinskey.grdbc;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import edu.unc.epidoc.transcoder.TransCoder;
 
 /**
  * This class provides methods to parse a chunk of XML containing a lexicon
@@ -44,32 +28,17 @@ import edu.unc.epidoc.transcoder.TransCoder;
  * into the database.
  * @author Ben Linskey
  */
-public class LexiconParser {
-	private Document doc;
-	private TransCoder transcoder;
-	
+public class LexiconParser extends GreekTextParser {
 	/**
 	 * Class constructor.
 	 * @param xml	the XML to parse
-	 * @throws ParserConfigurationException 
-	 * @throws IOException 
-	 * @throws SAXException 
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
 	 */
 	public LexiconParser(String xml) 
 			throws ParserConfigurationException, SAXException, IOException {
-		// Parse the XML and create a Document.
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		DocumentBuilder db = dbf.newDocumentBuilder();
-		InputSource is = new InputSource(new StringReader(xml));
-		doc = db.parse(is);
-		
-		// Create a TransCoder for converting Beta Code to Greek characters.
-		try {
-			transcoder = new TransCoder("BetaCode", "UnicodeC");
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+		super(xml);
 	}
 	
 	/**
@@ -135,64 +104,5 @@ public class LexiconParser {
 		transcodeInElements("ref");
 		transcodeInElements("foreign");
 		return getUpdatedXML();
-	}
-	
-	/**
-	 * Transcodes beta code to Greek in elements with the given name.
-	 * @param element	the name of the element to search for
-	 */
-	private void transcodeInElements(String element) {
-		NodeList nodeList = doc.getElementsByTagName(element);
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			Node elementNode = nodeList.item(i);
-			Node langAttr = elementNode.getAttributes().getNamedItem("lang");
-			if (langAttr != null) {
-				String lang = langAttr.getTextContent();
-				if (lang.equals("greek")) {
-					String greek = betaToGreek(elementNode.getTextContent());
-					langAttr.setTextContent(greek);
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Returns a string containing an XML representation of the document in its 
-	 * current state.
-	 * @return	a string containing an XML representation of the document in its 
-	 * 			current state
-	 */
-	private String getUpdatedXML() {
-		StringWriter writer = new StringWriter();
-		try {
-			TransformerFactory tf = TransformerFactory.newInstance();
-			Transformer transformer = tf.newTransformer();
-			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(writer);
-			transformer.transform(source, result);
-		} catch (TransformerConfigurationException e) {
-			e.printStackTrace();
-			System.exit(1);
-		} catch (TransformerException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		return writer.toString();
-	}
-	
-	/**
-	 * Converts Beta Code to Greek characters.
-	 * @param beta	the Beta Code to transcode
-	 * @return	the Greek equivalent of the specified Beta Code
-	 */
-	private String betaToGreek(String beta) {
-		String greek = null;
-		try {
-			greek = transcoder.getString(beta); 
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		return greek;
 	}
 }
