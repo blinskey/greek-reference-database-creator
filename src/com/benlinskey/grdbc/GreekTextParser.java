@@ -83,7 +83,7 @@ public abstract class GreekTextParser {
 				String lang = langAttr.getTextContent();
 				if (lang.equals("greek")) {
 					String greek = betaToGreek(elementNode.getTextContent());
-					langAttr.setTextContent(greek);
+					elementNode.setTextContent(greek);
 				}
 			}
 		}
