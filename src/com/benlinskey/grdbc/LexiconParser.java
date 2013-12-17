@@ -104,11 +104,12 @@ public class LexiconParser extends GreekTextParser {
 		transcodeInElements("orth");
 		transcodeInElements("ref");
 		transcodeInElements("foreign");
+		transcodeInElements("note");
 		return getUpdatedXML();
 	}
 	
 	/**
-	 * Converts the value of the entry element's "key" attribtute from Beta
+	 * Converts the value of the entry element's "key" attribute from Beta
 	 * Code to Greek. 
 	 */
 	private void transcodeEntryKey() {
