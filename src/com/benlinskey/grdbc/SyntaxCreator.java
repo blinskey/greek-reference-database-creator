@@ -33,8 +33,6 @@ import org.xml.sax.SAXException;
 /**
  * Reads in an XML file containing the Overview of Greek Syntax text and stores 
  * sections of the text in an SQLite database.
- * <p>
- * Note that the Sources Cited section is omitted, as it is on Perseus.
  * @author Ben Linskey
  *
  */
@@ -109,7 +107,7 @@ public class SyntaxCreator {
 		try {
 			String dropTable = "DROP TABLE IF EXISTS " + TABLE_NAME;			
 			String createTable = "CREATE TABLE " + TABLE_NAME + " (" + 
-					"_ID 			INTEGER PRIMARY KEY, " +
+					"_id 			INTEGER PRIMARY KEY, " +
 					"chapter	 	VARCHAR(100), " +
 					"section	 	VARCHAR(100), " +
 					"xml			TEXT)";			
@@ -146,6 +144,13 @@ public class SyntaxCreator {
 	                Matcher matcher = pattern.matcher(line);
 	                matcher.find();
 	                chapter = matcher.group(1);
+	                
+	                if (chapter.equals("Sources Cited")) {
+	                	section = chapter;
+	                	xml.delete(0, xml.length());
+		                xml.append("<section>");
+		                xml.append("<head>Sources Cited</head>");
+	                }
 	            } else if (line.startsWith("<div2")) {
 	                // Get section title.
 	                line = in.readLine(); // Next line is "head" element with title. 
@@ -172,6 +177,19 @@ public class SyntaxCreator {
 	                insertStatement.setString(1, chapter);
 	                insertStatement.setString(2, section);
 	                insertStatement.setString(3, transcodedXml);
+	                insertStatement.addBatch();
+	            } else if (line.contains("</div1>") && chapter.equals("Sources Cited")) {
+	            	// Get any XML before the "</div2>" tag.
+	                String[] split = line.split("</div1>");
+	                xml.append(split[0]);
+	            	
+	            	// Add closing root tag.
+	                xml.append("</section>");
+	                
+	                // Add data to database.
+	                insertStatement.setString(1, chapter);
+	                insertStatement.setString(2, section);
+	                insertStatement.setString(3, xml.toString());
 	                insertStatement.addBatch();
 	            } else {
 	                // Get next line of XML.
