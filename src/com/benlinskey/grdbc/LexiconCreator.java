@@ -203,7 +203,8 @@ public class LexiconCreator {
 
         // Create an index on the three columns matched against search queries.
         String sql = "CREATE INDEX searchIndex ON " + TABLE_NAME
-                + " (betaNoSymbols, betaSymbols, greekNoSymbols)";
+                + " (betaNoSymbols, betaSymbols, greekNoSymbols, "
+                + "greekLowercase)";
         try {
             Statement statement = connection.createStatement();
             statement.executeUpdate(sql);
