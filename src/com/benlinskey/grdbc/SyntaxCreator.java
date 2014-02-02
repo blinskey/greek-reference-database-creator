@@ -33,17 +33,11 @@ import org.xml.sax.SAXException;
 /**
  * Reads in an XML file containing the Overview of Greek Syntax text and stores
  * sections of the text in an SQLite database.
-<<<<<<< HEAD
- * <p>
- * Note that the Sources Cited section is omitted, as it is on Perseus.
  * 
-=======
->>>>>>> master
  * @author Ben Linskey
  * 
  */
 public class SyntaxCreator {
-<<<<<<< HEAD
     private final static String FILE = "../xml/Perseus_text_1999.04.0052.xml";
     private final static String DB = "syntax.db";
     private final static String TABLE_NAME = "syntax";
@@ -114,7 +108,7 @@ public class SyntaxCreator {
         try {
             String dropTable = "DROP TABLE IF EXISTS " + TABLE_NAME;
             String createTable = "CREATE TABLE " + TABLE_NAME + " ("
-                    + "_ID 			INTEGER PRIMARY KEY, "
+                    + "_id 			INTEGER PRIMARY KEY, "
                     + "chapter	 	VARCHAR(100), " + "section	 	VARCHAR(100), "
                     + "xml			TEXT)";
             Statement statement = connection.createStatement();
@@ -151,6 +145,13 @@ public class SyntaxCreator {
                     Matcher matcher = pattern.matcher(line);
                     matcher.find();
                     chapter = matcher.group(1);
+
+                    if (chapter.equals("Sources Cited")) {
+                        section = chapter;
+                        xml.delete(0, xml.length());
+                        xml.append("<section>");
+                        xml.append("<head>Sources Cited</head>");
+                    }
                 } else if (line.startsWith("<div2")) {
                     // Get section title.
                     line = in.readLine(); // Next line is "head" element with
@@ -179,6 +180,20 @@ public class SyntaxCreator {
                     insertStatement.setString(2, section);
                     insertStatement.setString(3, transcodedXml);
                     insertStatement.addBatch();
+                } else if (line.contains("</div1>")
+                        && chapter.equals("Sources Cited")) {
+                    // Get any XML before the "</div2>" tag.
+                    String[] split = line.split("</div1>");
+                    xml.append(split[0]);
+
+                    // Add closing root tag.
+                    xml.append("</section>");
+
+                    // Add data to database.
+                    insertStatement.setString(1, chapter);
+                    insertStatement.setString(2, section);
+                    insertStatement.setString(3, xml.toString());
+                    insertStatement.addBatch();
                 } else {
                     // Get next line of XML.
                     xml.append(line);
@@ -202,183 +217,4 @@ public class SyntaxCreator {
             System.exit(1);
         }
     }
-=======
-	private final static String FILE = "../xml/Perseus_text_1999.04.0052.xml";
-	private final static String DB = "syntax.db";
-	private final static String TABLE_NAME = "syntax";
-	private Connection connection;
-	private PreparedStatement insertStatement;
-	
-	/**
-	 * Class constructor. 
-	 */
-	public SyntaxCreator() {
-		// Load driver.
-		try {
-			Class.forName("org.sqlite.JDBC");
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		
-		// Connect to database.
-		try {
-			connection = DriverManager.getConnection("jdbc:sqlite:" + DB);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		
-		// Use batch inserts for speed.
-		try {
-			connection.setAutoCommit(false);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		
-		createDatabase();
-		
-		// Create a prepared statement to use when inserting entries.
-		try {
-			insertStatement = connection.prepareStatement("INSERT INTO " 
-					+ TABLE_NAME + " VALUES (NULL, ?, ?, ?)");
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-	}
-	
-	/**
-	 * Creates the Overview of Greek Syntax database.
-	 */
-	public void run() {
-		addSections();
-		try {
-			insertStatement.close();
-			connection.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-		System.out.println("Done.");
-	}
-	
-	/**
-	 * Resets the database if it already exists and creates a new, empty 
-	 * database.
-	 */
-	private void createDatabase() {
-		System.out.println("Creating lexicon database...");
-		try {
-			String dropTable = "DROP TABLE IF EXISTS " + TABLE_NAME;			
-			String createTable = "CREATE TABLE " + TABLE_NAME + " (" + 
-					"_id 			INTEGER PRIMARY KEY, " +
-					"chapter	 	VARCHAR(100), " +
-					"section	 	VARCHAR(100), " +
-					"xml			TEXT)";			
-			Statement statement = connection.createStatement();
-			statement.executeUpdate(dropTable);
-			statement.executeUpdate(createTable);
-			connection.commit();
-			statement.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-	}
-	
-	/**
-	 * Parses the XML file, modifies the sections, and inserts the modified 
-	 * data into the database.
-	 */
-	private void addSections() {
-		System.out.println("Inserting data...");
-		
-		String chapter = null;
-        String section = null;
-        StringBuilder xml = new StringBuilder();
-		Pattern pattern = Pattern.compile("<head>(.*?)</head>");
-		
-		try {
-	        BufferedReader in = new BufferedReader(new FileReader(FILE));
-	        while (in.ready()) {
-	            String line = in.readLine();
-	            if (line.startsWith("<div1")) {
-	                // Get chapter title.
-	                line = in.readLine(); // Next line is "head" element with title.
-	                Matcher matcher = pattern.matcher(line);
-	                matcher.find();
-	                chapter = matcher.group(1);
-	                
-	                if (chapter.equals("Sources Cited")) {
-	                	section = chapter;
-	                	xml.delete(0, xml.length());
-		                xml.append("<section>");
-		                xml.append("<head>Sources Cited</head>");
-	                }
-	            } else if (line.startsWith("<div2")) {
-	                // Get section title.
-	                line = in.readLine(); // Next line is "head" element with title. 
-	                Matcher matcher = pattern.matcher(line);
-	                matcher.find();
-	                section = matcher.group(1);
-	                
-	                // Reset XML and add "head" element.
-	                xml.delete(0, xml.length());
-	                xml.append("<section>");
-	                xml.append(line);
-	            } else if (line.contains("</div2>")) {
-	                // Get any XML before the "</div2>" tag.
-	                String[] split = line.split("</div2>");
-	                xml.append(split[0]);
-	                
-	                // Add closing root tag.
-	                xml.append("</section>");
-	                
-	                SyntaxParser parser = new SyntaxParser(xml.toString());
-	                String transcodedXml = parser.transcode();
-	                
-	                // Add data to database.
-	                insertStatement.setString(1, chapter);
-	                insertStatement.setString(2, section);
-	                insertStatement.setString(3, transcodedXml);
-	                insertStatement.addBatch();
-	            } else if (line.contains("</div1>") && chapter.equals("Sources Cited")) {
-	            	// Get any XML before the "</div2>" tag.
-	                String[] split = line.split("</div1>");
-	                xml.append(split[0]);
-	            	
-	            	// Add closing root tag.
-	                xml.append("</section>");
-	                
-	                // Add data to database.
-	                insertStatement.setString(1, chapter);
-	                insertStatement.setString(2, section);
-	                insertStatement.setString(3, xml.toString());
-	                insertStatement.addBatch();
-	            } else {
-	                // Get next line of XML.
-	                xml.append(line);
-	            }
-	        }
-	        in.close();
-	        
-	        insertStatement.executeBatch();
-	        connection.commit();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.exit(1);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-			System.exit(1);
-		} catch (SAXException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}       
-	}
->>>>>>> master
 }
