@@ -35,6 +35,11 @@ The project also includes the text of *Overview of Greek Syntax*, by Jeffrey A. 
 
 The above texts are licensed under a Creative Commons Attribution-ShareAlike 3.0 United States License. See http://creativecommons.org/licenses/by-sa/3.0/us/ for details.
 
+## License
+
+This project is licensed under the [Apache License, version 2.0][Apache], with the exception of the texts of *An Intermediate Greek-English Lexicon* and *Overview of Greek Syntax*, which are distributed under Creative Commons licenses as [described above](https://github.com/blinskey/greek-reference-database-creator#texts).
+
 [Greek Reference]: https://github.com/blinskey/greek-reference
 [EpiDoc TransCoder]: http://sourceforge.net/projects/epidoc/
 [SQLite JDBC Driver]: https://bitbucket.org/xerial/sqlite-jdbc
+[Apache]: http://www.apache.org/licenses/LICENSE-2.0
