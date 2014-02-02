@@ -107,7 +107,7 @@ public class LexiconCreator {
         try {
             String dropTable = "DROP TABLE IF EXISTS " + TABLE_NAME;
             String createTable = "CREATE TABLE " + TABLE_NAME + " ("
-                    + "_ID 			INTEGER PRIMARY KEY, "
+                    + "_id 			INTEGER PRIMARY KEY, "
                     + "betaNoSymbols 	VARCHAR(100), "
                     + "betaSymbols 	VARCHAR(100), "
                     + "greekFullWord 	VARCHAR(100), "
