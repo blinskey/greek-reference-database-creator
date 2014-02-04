@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -32,15 +33,21 @@ import org.xml.sax.SAXException;
 /**
  * Reads in an XML file containing a Greek lexicon and stores entries in an
  * SQLite database.
+ * <p>
+ * The entries in the XML file are not properly alphabetized, so we first read
+ * them into a temporary table and then alphabetize them and copy them into the
+ * final table in alphabetical order.
  * 
  * @author Ben Linskey
  */
 public class LexiconCreator {
     private final static String FILE = "../xml/Perseus_text_1999.04.0058.xml";
     private final static String DB = "lexicon.db";
-    private final static String TABLE_NAME = "lexicon";
+    private final static String TEMP_TABLE_NAME = "temp";
+    private final static String FINAL_TABLE_NAME = "lexicon";
     private Connection connection;
-    private PreparedStatement insertStatement;
+    private PreparedStatement tempInsertStatement;
+    private PreparedStatement finalInsertStatement;
 
     /**
      * Class constructor.
@@ -74,8 +81,10 @@ public class LexiconCreator {
 
         // Create a prepared statement to use when inserting entries.
         try {
-            insertStatement = connection.prepareStatement("INSERT INTO "
-                    + TABLE_NAME + " VALUES (NULL, ?, ?, ?, ?, ?, ?)");
+            tempInsertStatement = connection.prepareStatement("INSERT INTO "
+                    + TEMP_TABLE_NAME + " VALUES (?, ?, ?, ?, ?, ?)");
+            finalInsertStatement = connection.prepareStatement("INSERT INTO "
+                    + FINAL_TABLE_NAME + " VALUES (NULL, ?, ?, ?, ?, ?, ?)");
         } catch (SQLException e) {
             e.printStackTrace();
             System.exit(1);
@@ -87,9 +96,11 @@ public class LexiconCreator {
      */
     public void run() {
         addEntries();
+        alphabetize();
+        dropTempTable();
         createIndex();
+        vacuum();
         try {
-            insertStatement.close();
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -105,17 +116,26 @@ public class LexiconCreator {
     private void createDatabase() {
         System.out.println("Creating lexicon database...");
         try {
-            String dropTable = "DROP TABLE IF EXISTS " + TABLE_NAME;
-            String createTable = "CREATE TABLE " + TABLE_NAME + " ("
-                    + "_id 			INTEGER PRIMARY KEY, "
+            String dropTempTable = "DROP TABLE IF EXISTS " + TEMP_TABLE_NAME;
+            String createTempTable = "CREATE TABLE " + TEMP_TABLE_NAME + " ("
                     + "betaNoSymbols 	VARCHAR(100), "
                     + "betaSymbols 	VARCHAR(100), "
                     + "greekFullWord 	VARCHAR(100), "
                     + "greekNoSymbols 	VARCHAR(100), "
                     + "greekLowercase VARCHAR(100), " + "entry			TEXT)";
+            String dropFinalTable = "DROP TABLE IF EXISTS " + FINAL_TABLE_NAME;
+            String createFinalTable = "CREATE TABLE " + FINAL_TABLE_NAME + " ("
+                    + "_id          INTEGER PRIMARY KEY, "
+                    + "betaNoSymbols    VARCHAR(100), "
+                    + "betaSymbols  VARCHAR(100), "
+                    + "greekFullWord    VARCHAR(100), "
+                    + "greekNoSymbols   VARCHAR(100), "
+                    + "greekLowercase VARCHAR(100), " + "entry          TEXT)";
             Statement statement = connection.createStatement();
-            statement.executeUpdate(dropTable);
-            statement.executeUpdate(createTable);
+            statement.executeUpdate(dropTempTable);
+            statement.executeUpdate(createTempTable);
+            statement.executeUpdate(dropFinalTable);
+            statement.executeUpdate(createFinalTable);
             connection.commit();
             statement.close();
         } catch (SQLException e) {
@@ -150,8 +170,10 @@ public class LexiconCreator {
             }
             in.close();
 
-            insertStatement.executeBatch();
+            tempInsertStatement.executeBatch();
             connection.commit();
+
+            tempInsertStatement.close();
         } catch (FileNotFoundException e) {
             System.err.println("Error: Lexicon file not found.");
             System.exit(1);
@@ -173,13 +195,13 @@ public class LexiconCreator {
     private void processEntry(String xml) {
         try {
             LexiconParser parser = new LexiconParser(xml);
-            insertStatement.setString(1, parser.getBetaNoSymbols());
-            insertStatement.setString(2, parser.getBetaSymbols());
-            insertStatement.setString(3, parser.getGreekFullWord());
-            insertStatement.setString(4, parser.getGreekNoSymbols());
-            insertStatement.setString(5, parser.getGreekLowercase());
-            insertStatement.setString(6, parser.getEntry());
-            insertStatement.addBatch();
+            tempInsertStatement.setString(1, parser.getBetaNoSymbols());
+            tempInsertStatement.setString(2, parser.getBetaSymbols());
+            tempInsertStatement.setString(3, parser.getGreekFullWord());
+            tempInsertStatement.setString(4, parser.getGreekNoSymbols());
+            tempInsertStatement.setString(5, parser.getGreekLowercase());
+            tempInsertStatement.setString(6, parser.getEntry());
+            tempInsertStatement.addBatch();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
             System.exit(1);
@@ -196,13 +218,56 @@ public class LexiconCreator {
     }
 
     /**
+     * Copies the entries from the temporary table into the final table in
+     * alphabetical order.
+     */
+    private void alphabetize() {
+        try {
+            String query = "SELECT * FROM " + TEMP_TABLE_NAME
+                    + " ORDER BY greekLowercase ASC";
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+            while (rs.next()) {
+                finalInsertStatement.setString(1, rs.getString(1));
+                finalInsertStatement.setString(2, rs.getString(2));
+                finalInsertStatement.setString(3, rs.getString(3));
+                finalInsertStatement.setString(4, rs.getString(4));
+                finalInsertStatement.setString(5, rs.getString(5));
+                finalInsertStatement.setString(6, rs.getString(6));
+                finalInsertStatement.addBatch();
+            }
+
+            finalInsertStatement.executeBatch();
+            connection.commit();
+
+            statement.close();
+            finalInsertStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Drops the temporary table.
+     */
+    private void dropTempTable() {
+        String sql = "DROP TABLE " + TEMP_TABLE_NAME;
+        try {
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Creates an index on the database to speed up searches.
      */
     private void createIndex() {
         System.out.println("Creating index...");
 
         // Create an index on the three columns matched against search queries.
-        String sql = "CREATE INDEX searchIndex ON " + TABLE_NAME
+        String sql = "CREATE INDEX searchIndex ON " + FINAL_TABLE_NAME
                 + " (betaNoSymbols, betaSymbols, greekNoSymbols, "
                 + "greekLowercase)";
         try {
@@ -210,6 +275,21 @@ public class LexiconCreator {
             statement.executeUpdate(sql);
             statement.close();
             connection.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Rebuilds the database in order to reduce its size.
+     */
+    private void vacuum() {
+        System.out.println("Rebuilding database...");
+        try {
+            connection.setAutoCommit(true);
+            Statement statement = connection.createStatement();
+            statement.executeUpdate("VACUUM");
+            statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
