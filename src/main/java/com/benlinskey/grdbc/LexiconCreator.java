@@ -1,4 +1,4 @@
-/* Copyright 2013 Benjamin Linskey
+/* Copyright 2013-2015 Benjamin Linskey
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,7 @@
 
 package com.benlinskey.grdbc;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -36,7 +33,8 @@ import org.xml.sax.SAXException;
  * @author Ben Linskey
  */
 public class LexiconCreator {
-    private final static String FILE = "../xml/Perseus_text_1999.04.0058.xml";
+
+    private final static String PATH = "resources/xml/Perseus_text_1999.04.0058.xml";
     private final static String DB = "lexicon.db";
     private final static String TABLE_NAME = "lexicon";
     private Connection connection;
@@ -132,7 +130,9 @@ public class LexiconCreator {
         System.out.println("Inserting entries...");
 
         try {
-            BufferedReader in = new BufferedReader(new FileReader(FILE));
+            InputStream fileStream = getClass().getClassLoader().getResourceAsStream(PATH);
+            InputStreamReader reader = new InputStreamReader(fileStream);
+            BufferedReader in = new BufferedReader(reader);
             StringBuilder xml = new StringBuilder();
 
             // Extract the XML for each lexicon entry, then process it.
@@ -153,7 +153,7 @@ public class LexiconCreator {
             insertStatement.executeBatch();
             connection.commit();
         } catch (FileNotFoundException e) {
-            System.err.println("Error: Lexicon file not found.");
+            System.err.println("Error: Lexicon file not found");
             System.exit(1);
         } catch (IOException e) {
             e.printStackTrace();

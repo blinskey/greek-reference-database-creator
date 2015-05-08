@@ -1,4 +1,4 @@
-/* Copyright 2013 Benjamin Linskey
+/* Copyright 2013-2015 Benjamin Linskey
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,8 @@
 
 package com.benlinskey.grdbc;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.Buffer;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -38,7 +37,8 @@ import org.xml.sax.SAXException;
  * 
  */
 public class SyntaxCreator {
-    private final static String FILE = "../xml/Perseus_text_1999.04.0052.xml";
+
+    private final static String PATH = "resources/xml/Perseus_text_1999.04.0052.xml";
     private final static String DB = "syntax.db";
     private final static String TABLE_NAME = "syntax";
     private Connection connection;
@@ -135,7 +135,9 @@ public class SyntaxCreator {
         Pattern pattern = Pattern.compile("<head>(.*?)</head>");
 
         try {
-            BufferedReader in = new BufferedReader(new FileReader(FILE));
+            InputStream fileStream = getClass().getClassLoader().getResourceAsStream(PATH);
+            InputStreamReader reader = new InputStreamReader(fileStream);
+            BufferedReader in = new BufferedReader(reader);
             while (in.ready()) {
                 String line = in.readLine();
                 if (line.startsWith("<div1")) {
