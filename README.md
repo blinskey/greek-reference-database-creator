@@ -2,6 +2,8 @@
 
 This program creates the SQLite database used in the [Greek Reference][] app for Android.
 
+Please report all issues to the [Greek Reference issue tracker][].
+
 ## Dependencies
 
 - SQLite3
@@ -40,6 +42,7 @@ The above texts are licensed under a Creative Commons Attribution-ShareAlike 3.0
 This project is licensed under the [Apache License, version 2.0][Apache], with the exception of the texts of *An Intermediate Greek-English Lexicon* and *Overview of Greek Syntax*, which are distributed under Creative Commons licenses as [described above](https://github.com/blinskey/greek-reference-database-creator#texts).
 
 [Greek Reference]: https://github.com/blinskey/greek-reference
+[Greek Reference issue tracker]: https://github.com/blinskey/greek-reference/issues
 [EpiDoc TransCoder]: http://sourceforge.net/projects/epidoc/
 [SQLite JDBC Driver]: https://bitbucket.org/xerial/sqlite-jdbc
 [Apache]: http://www.apache.org/licenses/LICENSE-2.0
