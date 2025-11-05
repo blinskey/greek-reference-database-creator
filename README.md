@@ -38,6 +38,10 @@ Library, with funding from The Annenberg CPB/Project. Original version
 available for viewing and download at http://www.perseus.tufts.edu/hopper/.
 I have made a number of corrections to the original text.
 
+For convenience, a copy of the text with the typographical corrections applied
+in this repository, sans whitespace changes, may be obtained from a [separate
+repository][middle-liddell].
+
 The project also includes the text of *Overview of Greek Syntax*, by Jeffrey A.
 Rydberg-Cox. Text provided by Perseus Digital Library, with funding from The
 Annenberg CPB/Project. Original version available for viewing and download at
@@ -58,3 +62,4 @@ third-party resources included in this repository.
 [SQLite JDBC Driver]: https://github.com/xerial/sqlite-jdbc/
 [Apache]: http://www.apache.org/licenses/LICENSE-2.0
 [CC-BY-SA 3.0]: https://creativecommons.org/licenses/by-sa/3.0/us/
+[middle-liddell]: https://github.com/blinskey/middle-liddell
