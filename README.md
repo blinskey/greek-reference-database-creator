@@ -3,8 +3,6 @@
 This program creates the SQLite database used in the [Greek Reference][] app
 for Android.
 
-Please report all issues to the [Greek Reference issue tracker][].
-
 ## Dependencies
 
 - SQLite3
@@ -25,10 +23,11 @@ Run `ant` from the project's root directory to build the JAR.
 
 ## Third-Party Libraries
 
-This program uses the following third-party libraries. Thanks to their authors
-for making their work available.
+This program uses the following third-party libraries, distributed with this
+repository in the `lib` directory. Thanks to their authors for making their
+work available.
 
-- [EpiDoc TransCoder][]
+- [EpiDoc TransCoder][] ([source][transcoder-source])
 - [SQLite JDBC Driver][]
 
 ## Texts
@@ -44,16 +43,18 @@ Rydberg-Cox. Text provided by Perseus Digital Library, with funding from The
 Annenberg CPB/Project. Original version available for viewing and download at
 http://www.perseus.tufts.edu/hopper/.
 
-The above texts are licensed under a Creative Commons Attribution-ShareAlike
-3.0 United States License. See http://creativecommons.org/licenses/by-sa/3.0/us/ 
-for details.
+The above texts are licensed under a [Creative Commons Attribution-ShareAlike
+3.0 United States License][CC-BY-SA 3.0].
 
 ## License
 
-This project is licensed under the [Apache License, version 2.0][Apache], with the exception of the texts of *An Intermediate Greek-English Lexicon* and *Overview of Greek Syntax*, which are distributed under Creative Commons licenses as [described above](https://github.com/blinskey/greek-reference-database-creator#texts).
+This project is licensed under the [Apache License, Version 2.0][Apache]. 
+See the `LICENSE` file for this project's license and the licenses of the
+third-party resources included in this repository.
 
 [Greek Reference]: https://github.com/blinskey/greek-reference
-[Greek Reference issue tracker]: https://github.com/blinskey/greek-reference/issues
-[EpiDoc TransCoder]: http://sourceforge.net/projects/epidoc/
-[SQLite JDBC Driver]: https://bitbucket.org/xerial/sqlite-jdbc
+[EpiDoc TransCoder]: https://sourceforge.net/projects/epidoc/files/Transcoder/
+[transcoder-source]: https://sourceforge.net/p/epidoc/code/HEAD/tree/trunk/transcoder/
+[SQLite JDBC Driver]: https://github.com/xerial/sqlite-jdbc/
 [Apache]: http://www.apache.org/licenses/LICENSE-2.0
+[CC-BY-SA 3.0]: https://creativecommons.org/licenses/by-sa/3.0/us/
