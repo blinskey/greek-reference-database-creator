@@ -1,6 +1,7 @@
 # Greek Reference Database Creator
 
-This program creates the SQLite database used in the [Greek Reference][] app for Android.
+This program creates the SQLite database used in the [Greek Reference][] app
+for Android.
 
 Please report all issues to the [Greek Reference issue tracker][].
 
@@ -24,18 +25,28 @@ Run `ant` from the project's root directory to build the JAR.
 
 ## Third-Party Libraries
 
-This program uses the following third-party libraries. Thanks to their authors for making their work available.
+This program uses the following third-party libraries. Thanks to their authors
+for making their work available.
 
 - [EpiDoc TransCoder][]
 - [SQLite JDBC Driver][]
 
 ## Texts
 
-This project includes the text of *An Intermediate Greek-English Lexicon*, by Henry George Liddell and Robert Scott. Text provided by Perseus Digital Library, with funding from The Annenberg CPB/Project. Original version available for viewing and download at http://www.perseus.tufts.edu/hopper/. I have made a number of corrections to the original text.
+This project includes the text of *An Intermediate Greek-English Lexicon*, by
+Henry George Liddell and Robert Scott. Text provided by Perseus Digital
+Library, with funding from The Annenberg CPB/Project. Original version
+available for viewing and download at http://www.perseus.tufts.edu/hopper/.
+I have made a number of corrections to the original text.
 
-The project also includes the text of *Overview of Greek Syntax*, by Jeffrey A. Rydberg-Cox. Text provided by Perseus Digital Library, with funding from The Annenberg CPB/Project. Original version available for viewing and download at http://www.perseus.tufts.edu/hopper/.
+The project also includes the text of *Overview of Greek Syntax*, by Jeffrey A.
+Rydberg-Cox. Text provided by Perseus Digital Library, with funding from The
+Annenberg CPB/Project. Original version available for viewing and download at
+http://www.perseus.tufts.edu/hopper/.
 
-The above texts are licensed under a Creative Commons Attribution-ShareAlike 3.0 United States License. See http://creativecommons.org/licenses/by-sa/3.0/us/ for details.
+The above texts are licensed under a Creative Commons Attribution-ShareAlike
+3.0 United States License. See http://creativecommons.org/licenses/by-sa/3.0/us/ 
+for details.
 
 ## License
 
