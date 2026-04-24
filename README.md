@@ -3,6 +3,9 @@
 This program creates the SQLite database used in the [Greek Reference][] app
 for Android.
 
+This repository is hosted on [git.linskey.org](https://git.linskey.org/greek-reference-database-creator)
+and mirrored on [GitHub](https://github.com/blinskey/greek-reference-database-creator).
+
 ## Dependencies
 
 - SQLite3
